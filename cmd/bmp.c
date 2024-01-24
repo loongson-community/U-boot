@@ -255,8 +255,8 @@ int bmp_display(ulong addr, int x, int y)
 	addr = map_to_sysmem(bmp);
 
 #ifdef CONFIG_DM_VIDEO
-	ret = uclass_first_device_err(UCLASS_VIDEO, &dev);
-	if (!ret) {
+	for (uclass_first_device(UCLASS_VIDEO, &dev);
+				dev != NULL; uclass_next_device(&dev)) {
 		bool align = false;
 
 		if (CONFIG_IS_ENABLED(SPLASH_SCREEN_ALIGN) ||

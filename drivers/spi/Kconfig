@@ -197,6 +197,13 @@ config KIRKWOOD_SPI
 	  Enable support for SPI on various Marvell SoCs, such as
 	  Kirkwood and Armada 375.
 
+config LOONGSON_SPI
+	bool "Loongson SPI Driver"
+	select CLK
+	select CLK_CCF
+	help
+	  Enable support for SPI on Loongson SoCs.
+
 config MESON_SPIFC
 	bool "Amlogic Meson SPI Flash Controller driver"
 	depends on ARCH_MESON

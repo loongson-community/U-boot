@@ -47,6 +47,18 @@ scm_version()
 	if test -z "$(git rev-parse --show-cdup 2>/dev/null)" &&
 	   head=$(git rev-parse --verify --short HEAD 2>/dev/null); then
 
+		# show tag info
+		atag="$(git describe --exact-match 2>/dev/null)"
+		if [ -z "$atag" ]; then
+			atag="$(git describe --tags 2>/dev/null)"
+			atag=${atag%-*}
+			atag=${atag%-*}
+		fi
+
+		if [ -n "$atag" ]; then
+			echo -n "-$atag"
+		fi
+
 		# If we are at a tagged commit (like "v2.6.30-rc6"), we ignore
 		# it, because this version is defined in the top level Makefile.
 		if [ -z "$(git describe --exact-match 2>/dev/null)" ]; then

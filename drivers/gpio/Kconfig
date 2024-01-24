@@ -550,4 +550,11 @@ config SL28CPLD_GPIO
 	help
 	  Support GPIO access on Kontron sl28cpld board management controllers.
 
+config LOONGSON_GPIO
+	bool "Loongson GPIO driver"
+	depends on DM_GPIO
+	default n
+	help
+	  Say yes here to support Loongson soc compatible GPIOs.
+
 endif

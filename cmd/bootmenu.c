@@ -74,6 +74,16 @@ static void bootmenu_print_entry(void *data)
 
 	if (reverse)
 		puts(ANSI_COLOR_REVERSE);
+	
+#ifdef CONFIG_BOOTMENU_HAVE_NUM
+	{
+	char buf[8];
+	char num = entry->num + 1;
+	num = num > 9 ? (num - 10 + 0x61) : (num + 0x30);
+	sprintf(buf, "[%c] ", num);
+	puts(buf);
+	}
+#endif
 
 	puts(entry->title);
 

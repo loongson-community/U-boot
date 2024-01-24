@@ -26,6 +26,7 @@
 #include <i2c.h>
 #include <eeprom_layout.h>
 #include <linux/delay.h>
+#include <mapmem.h>
 
 #ifndef	I2C_RXTX_LEN
 #define I2C_RXTX_LEN	128
@@ -206,6 +207,17 @@ static int parse_numeric_param(char *str)
 	int value = simple_strtol(str, &endptr, 16);
 
 	return (*endptr != '\0') ? -1 : value;
+}
+
+static ulong parse_addr_param(char *str)
+{
+	char *endptr;
+	ulong addr = simple_strtoul(str, &endptr, 16);
+
+	if (*endptr != '\0')
+		return -1;
+	
+	return (ulong)map_sysmem(addr, 0);
 }
 
 /**
@@ -395,7 +407,7 @@ int do_eeprom(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
 		NEXT_PARAM(argc, index);
 
 	if (action == EEPROM_READ || action == EEPROM_WRITE) {
-		addr = parse_numeric_param(argv[index]);
+		addr = parse_addr_param(argv[index]);
 		NEXT_PARAM(argc, index);
 		off = parse_numeric_param(argv[index]);
 		NEXT_PARAM(argc, index);

@@ -65,6 +65,12 @@ config ARM
 	select SUPPORT_ACPI
 	select SUPPORT_OF_CONTROL
 
+config LOONGARCH
+	bool "LOONGARCH architecture"
+	select HAVE_ARCH_IOREMAP
+	select HAVE_PRIVATE_LIBGCC
+	select SUPPORT_OF_CONTROL
+
 config M68K
 	bool "M68000 architecture"
 	select HAVE_PRIVATE_LIBGCC
@@ -433,6 +439,7 @@ config TPL_SKIP_LOWLEVEL_INIT_ONLY
 
 source "arch/arc/Kconfig"
 source "arch/arm/Kconfig"
+source "arch/loongarch/Kconfig"
 source "arch/m68k/Kconfig"
 source "arch/microblaze/Kconfig"
 source "arch/mips/Kconfig"

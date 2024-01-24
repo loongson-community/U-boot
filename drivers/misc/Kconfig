@@ -520,4 +520,10 @@ config SL28CPLD
 	  the base driver which provides common access methods for the
 	  sub-drivers.
 
+config LS2K500_POWER_DOMAIN
+	bool "Enable LS2K500 power domain driver"
+	depends on ARCH_LA_LOONGSON
+	help
+	  Enable support for manipulating LS2K500 on-SoC power domains.
+
 endmenu

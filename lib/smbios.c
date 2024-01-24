@@ -517,12 +517,16 @@ ulong write_smbios_table(ulong addr)
 	memcpy(se->intermediate_anchor, "_DMI_", 5);
 	se->struct_table_length = len;
 
+#ifdef CONFIG_MACH_LOONGSON
+	table_addr = (ulong)VA_TO_PHYS(tables);
+#else
 	/*
 	 * We must use a pointer here so things work correctly on sandbox. The
 	 * user of this table is not aware of the mapping of addresses to
 	 * sandbox's DRAM buffer.
 	 */
 	table_addr = (ulong)map_sysmem(tables, 0);
+#endif
 	if (sizeof(table_addr) > sizeof(u32) && table_addr > (ulong)UINT_MAX) {
 		/*
 		 * We need to put this >32-bit pointer into the table but the

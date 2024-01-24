@@ -8,6 +8,7 @@
 #include <log.h>
 #include <malloc.h>
 #include <spl.h>
+#include <mapmem.h>
 
 #include <lzma/LzmaTypes.h>
 #include <lzma/LzmaDec.h>
@@ -33,14 +34,14 @@ int spl_parse_legacy_header(struct spl_image_info *spl_image,
 		 * entry-point is located at address 0. We can't load
 		 * to 0-0x40. So skip header in this case.
 		 */
-		spl_image->load_addr = image_get_load(header);
-		spl_image->entry_point = image_get_ep(header);
+		spl_image->load_addr = (uintptr_t)map_sysmem(image_get_load(header), 0);
+		spl_image->entry_point = (uintptr_t)map_sysmem(image_get_ep(header), 0);
 		spl_image->size = image_get_data_size(header);
 	} else {
-		spl_image->entry_point = image_get_ep(header);
+		spl_image->entry_point = (uintptr_t)map_sysmem(image_get_ep(header), 0);
 		/* Load including the header */
-		spl_image->load_addr = image_get_load(header) -
-			header_size;
+		spl_image->load_addr = (uintptr_t)map_sysmem(image_get_load(header) -
+			header_size, 0);
 		spl_image->size = image_get_data_size(header) +
 			header_size;
 	}

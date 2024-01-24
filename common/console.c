@@ -939,21 +939,33 @@ void stdio_print_current_devices(void)
 	if (stdio_devices[stdin] == NULL) {
 		puts("No input devices available!\n");
 	} else {
+#if CONFIG_IS_ENABLED(CONSOLE_MUX)
+		iomux_printdevs(stdin);
+#else
 		printf ("%s\n", stdio_devices[stdin]->name);
+#endif
 	}
 
 	puts("Out:   ");
 	if (stdio_devices[stdout] == NULL) {
 		puts("No output devices available!\n");
 	} else {
+#if CONFIG_IS_ENABLED(CONSOLE_MUX)
+		iomux_printdevs(stdout);
+#else
 		printf ("%s\n", stdio_devices[stdout]->name);
+#endif
 	}
 
 	puts("Err:   ");
 	if (stdio_devices[stderr] == NULL) {
 		puts("No error devices available!\n");
 	} else {
+#if CONFIG_IS_ENABLED(CONSOLE_MUX)
+		iomux_printdevs(stderr);
+#else
 		printf ("%s\n", stdio_devices[stderr]->name);
+#endif
 	}
 }
 

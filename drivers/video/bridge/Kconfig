@@ -33,3 +33,10 @@ config VIDEO_BRIDGE_ANALOGIX_ANX6345
 	help
 	 The Analogix ANX6345 is RGB-to-DP converter. It enables an eDP LCD
 	 panel to be connected to an parallel LCD interface.
+
+config VIDEO_BRIDGE_LATTICESEMI_SII9022
+	bool "Support Latticesemi SII9022 RGB->HDMI bridge"
+	depends on VIDEO_BRIDGE
+	select DM_I2C
+	help
+	 The Latticesemi SII9022 is RGB-to-HDMI converter.

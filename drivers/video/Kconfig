@@ -682,6 +682,14 @@ config VIDEO_SEPS525
 
 source "drivers/video/nexell/Kconfig"
 
+config VIDEO_LOONGSON
+	bool "Enable video support on Loongson SoC"
+	depends on DM_VIDEO
+	select PANEL
+	select DISPLAY
+	help
+	  Enable Loongson SoC Display controller support.
+
 config VIDEO
 	bool "Enable legacy video support"
 	depends on !DM_VIDEO

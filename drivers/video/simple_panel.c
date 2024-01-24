@@ -48,6 +48,38 @@ static int simple_panel_set_backlight(struct udevice *dev, int percent)
 	return 0;
 }
 
+static int simple_panel_get_display_timing(struct udevice *dev, 
+				struct display_timing *timing)
+{
+	ofnode timings, node;
+	struct ofnode_phandle_args args;
+	int ret, index;
+
+	timings = ofnode_find_subnode(dev->node_, "display-timings");
+	if (!ofnode_valid(timings))
+		return -EINVAL;
+	
+	ret = ofnode_parse_phandle_with_args(dev->node_, "native-mode", NULL, 0, 0, &args);
+	if (ret) {
+		// no native-mode prop, use the first one.
+		index = 0;
+	} else {
+		index = 0;
+		ofnode_for_each_subnode(node, timings) {
+			if (!ofnode_valid(node)){
+				index = 0;
+				break;
+			}
+			if (ofnode_is_np(node) &&
+					ofnode_to_np(node) == args.node.np)
+				break;
+			index++;
+		}
+	}
+
+	return dev_decode_display_timing(dev, index, timing);
+}
+
 static int simple_panel_of_to_plat(struct udevice *dev)
 {
 	struct simple_panel_priv *priv = dev_get_priv(dev);
@@ -99,6 +131,7 @@ static int simple_panel_probe(struct udevice *dev)
 static const struct panel_ops simple_panel_ops = {
 	.enable_backlight	= simple_panel_enable_backlight,
 	.set_backlight		= simple_panel_set_backlight,
+	.get_display_timing = simple_panel_get_display_timing,
 };
 
 static const struct udevice_id simple_panel_ids[] = {

@@ -61,6 +61,14 @@ config TI_KSNAV
 	help
 	  Enable the Keystone Navigator driver for Keystone 2 platforms.
 
+config LOONGSON_DMA
+	bool "Longson 1x/2k/2k500 dma driver"
+	select DMA_CHANNELS
+	help
+	  Enable the Longson 1x/2k/2k500 dma controller driver.
+	  This driver support data transfer from devices to memory 
+	  and from memory to devices.
+
 config APBH_DMA
 	bool "Support APBH DMA"
 	depends on MX23 || MX28 || MX6 || MX7 || IMX8 || IMX8M

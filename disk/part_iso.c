@@ -10,7 +10,7 @@
 #include <part.h>
 #include <asm/cache.h>
 #include <asm/unaligned.h>
-#include "part_iso.h"
+#include <part_iso.h>
 
 #ifdef CONFIG_HAVE_BLOCK_DEVICE
 
@@ -24,28 +24,8 @@
 
 /* enable this if CDs are written with the PowerPC Platform ID */
 #undef CHECK_FOR_POWERPC_PLATTFORM
-#define CD_SECTSIZE 2048
 
 static unsigned char tmpbuf[CD_SECTSIZE] __aligned(ARCH_DMA_MINALIGN);
-
-unsigned long iso_dread(struct blk_desc *block_dev, lbaint_t start,
-                        lbaint_t blkcnt, void *buffer)
-{
-	unsigned long ret;
-
-	if (block_dev->blksz == 512) {
-		/* Convert from 2048 to 512 sector size */
-		start *= 4;
-		blkcnt *= 4;
-	}
-
-	ret = blk_dread(block_dev, start, blkcnt, buffer);
-
-	if (block_dev->blksz == 512)
-		ret /= 4;
-
-	return ret;
-}
 
 /* only boot records will be listed as valid partitions */
 int part_get_info_iso_verb(struct blk_desc *dev_desc, int part_num,

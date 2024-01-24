@@ -384,7 +384,11 @@ static int m88e151x_config(struct phy_device *phydev)
 		reg &= ~MIIM_88E151x_RGMII_RXTX_DELAY;
 		if (phydev->interface == PHY_INTERFACE_MODE_RGMII ||
 		    phydev->interface == PHY_INTERFACE_MODE_RGMII_ID)
+#ifdef CONFIG_SOC_LS2K500
+			reg |= MIIM_88E151x_RGMII_TX_DELAY;
+#else
 			reg |= MIIM_88E151x_RGMII_RXTX_DELAY;
+#endif
 		else if (phydev->interface == PHY_INTERFACE_MODE_RGMII_RXID)
 			reg |= MIIM_88E151x_RGMII_RX_DELAY;
 		else if (phydev->interface == PHY_INTERFACE_MODE_RGMII_TXID)

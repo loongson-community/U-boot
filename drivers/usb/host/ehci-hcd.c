@@ -25,6 +25,12 @@
 
 #include "ehci.h"
 
+#if defined(CONFIG_MACH_LOONGSON)
+#define usb_phy_addr_to_cpu_addr(addr) dma_to_virt((phys_addr_t)addr)
+#elif
+#define usb_phy_addr_to_cpu_addr(addr)
+#endif
+
 #ifndef CONFIG_USB_MAX_CONTROLLER_COUNT
 #define CONFIG_USB_MAX_CONTROLLER_COUNT 1
 #endif
@@ -1085,6 +1091,8 @@ static int ehci_common_init(struct ehci_ctrl *ctrl, uint tweaks)
 	 */
 	ctrl->periodic_schedules = 0;
 	periodic = &ctrl->periodic_queue;
+	//may be will in here
+	periodic = (struct QH*)usb_phy_addr_to_cpu_addr(periodic);
 	memset(periodic, 0, sizeof(*periodic));
 	periodic->qh_link = cpu_to_hc32(QH_LINK_TERMINATE);
 	periodic->qh_overlay.qt_next = cpu_to_hc32(QT_NEXT_TERMINATE);
@@ -1361,6 +1369,10 @@ static struct int_queue *_ehci_create_int_queue(struct usb_device *dev,
 		struct qTD *td = result->tds + i;
 		void **buf = &qh->buffer;
 
+		// not necessary
+		qh = (struct QH*)usb_phy_addr_to_cpu_addr(qh);
+		td = (struct qTD*)usb_phy_addr_to_cpu_addr(td);
+
 		qh->qh_link = cpu_to_hc32((unsigned long)(qh+1) | QH_LINK_TYPE_QH);
 		if (i == queuesize - 1)
 			qh->qh_link = cpu_to_hc32(QH_LINK_TERMINATE);
@@ -1426,6 +1438,8 @@ static struct int_queue *_ehci_create_int_queue(struct usb_device *dev,
 
 	/* hook up to periodic list */
 	struct QH *list = &ctrl->periodic_queue;
+	// not necessary
+	list = (struct QH*)usb_phy_addr_to_cpu_addr(list);
 	result->last->qh_link = list->qh_link;
 	list->qh_link = cpu_to_hc32((unsigned long)result->first | QH_LINK_TYPE_QH);
 
@@ -1464,8 +1478,12 @@ static void *_ehci_poll_int_queue(struct usb_device *dev,
 		debug("Exit poll_int_queue with completed queue\n");
 		return NULL;
 	}
+
+	// not necessary
+	cur = (struct QH *)usb_phy_addr_to_cpu_addr(cur);
 	/* still active */
 	cur_td = &queue->tds[queue->current - queue->first];
+	cur_td = (struct qTD *)usb_phy_addr_to_cpu_addr(cur_td);
 	invalidate_dcache_range((unsigned long)cur_td,
 				ALIGN_END_ADDR(struct qTD, cur_td, 1));
 	token = hc32_to_cpu(cur_td->qt_token);
@@ -1506,6 +1524,7 @@ static int _ehci_destroy_int_queue(struct usb_device *dev,
 	ctrl->periodic_schedules--;
 
 	struct QH *cur = &ctrl->periodic_queue;
+	cur = (struct QH *)usb_phy_addr_to_cpu_addr(cur);
 	timeout = get_timer(0) + 500; /* abort after 500ms */
 	while (!(cur->qh_link & cpu_to_hc32(QH_LINK_TERMINATE))) {
 		debug("considering %p, with qh_link %x\n", cur, cur->qh_link);
@@ -1518,6 +1537,7 @@ static int _ehci_destroy_int_queue(struct usb_device *dev,
 			break;
 		}
 		cur = NEXT_QH(cur);
+		cur = (struct QH *)usb_phy_addr_to_cpu_addr(cur);
 		if (get_timer(0) > timeout) {
 			printf("Timeout destroying interrupt endpoint queue\n");
 			result = -1;

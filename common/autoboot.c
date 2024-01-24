@@ -25,6 +25,7 @@
 #include <bootcount.h>
 #include <crypt.h>
 #include <dm/ofnode.h>
+#include <ansi.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -52,6 +53,9 @@ static int menukey;
 #else
 #define AUTOBOOT_MENUKEY 0
 #endif
+
+#define STDOUT_SERIAL_OFF	0
+#define STDOUT_SERIAL_ON	1
 
 /**
  * passwd_abort_crypt() - check for a crypt-style hashed key sequence to abort booting
@@ -290,7 +294,7 @@ static int passwd_abort_key(uint64_t etime)
 				/* don't retry auto boot */
 				if (!delaykey[i].retry)
 					bootretry_dont_retry();
-				abort = 1;
+				abort = 1 + i;
 			}
 		}
 	} while (!abort && get_ticks() <= etime);
@@ -472,21 +476,47 @@ const char *bootdelay_process(void)
 	return s;
 }
 
+static void set_stdout(int serial_en)
+{
+	if (serial_en) {
+#ifdef CONFIG_VIDEO
+		env_set("stdout", "serial,vga");
+#elif CONFIG_DM_VIDEO
+		env_set("stdout", "serial,vidconsole,vidconsole1");
+#endif
+	} else {
+#ifdef CONFIG_VIDEO
+		env_set("stdout", "vga");
+#elif CONFIG_DM_VIDEO
+		env_set("stdout", "vidconsole,vidconsole1");
+#endif
+	}
+}
+
 void autoboot_command(const char *s)
 {
 	debug("### main_loop: bootcmd=\"%s\"\n", s ? s : "<UNDEFINED>");
-
+	int abort = 0;
+	abort = abortboot(stored_bootdelay);
 	if (s && (stored_bootdelay == -2 ||
-		 (stored_bootdelay != -1 && !abortboot(stored_bootdelay)))) {
+		 (stored_bootdelay != -1 && !abort))) {
 		bool lock;
 		int prev;
+		int ret;
 
 		lock = autoboot_keyed() &&
 			!IS_ENABLED(CONFIG_AUTOBOOT_KEYED_CTRLC);
 		if (lock)
 			prev = disable_ctrlc(1); /* disable Ctrl-C checking */
 
-		run_command_list(s, -1, 0);
+		ret = run_command_list(s, -1, 0);
+		if (ret) {
+#ifdef CONFIG_MACH_LOONGSON
+			set_stdout(STDOUT_SERIAL_ON);
+			printf("Bootcmd=\"%s\"\n", s ? s : "<UNDEFINED>");
+			printf("Boot Kernel failed. Kernel not found or bad.\n");
+#endif
+		}
 
 		if (lock)
 			disable_ctrlc(prev);	/* restore Ctrl-C checking */
@@ -497,5 +527,23 @@ void autoboot_command(const char *s)
 		s = env_get("menucmd");
 		if (s)
 			run_command_list(s, -1, 0);
+	} else {
+#ifdef CONFIG_MACH_LOONGSON
+		switch (abort) {
+		case 1: //bootdelaykey
+			set_stdout(STDOUT_SERIAL_ON);
+			s = env_get("menucmd");
+			if (s)
+				run_command_list(s, -1, 0);
+			break;
+		case 2: //bootstopkey
+			set_stdout(STDOUT_SERIAL_OFF);
+#if defined(CONFIG_VIDEO) || defined(CONFIG_DM_VIDEO)
+			puts(ANSI_CLEAR_CONSOLE);
+#endif
+			set_stdout(STDOUT_SERIAL_ON);
+			break;
+		}
+#endif
 	}
 }

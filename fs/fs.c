@@ -16,6 +16,7 @@
 #include <part.h>
 #include <ext4fs.h>
 #include <fat.h>
+#include <isofs.h>
 #include <fs.h>
 #include <sandboxfs.h>
 #include <ubifs_uboot.h>
@@ -303,6 +304,26 @@ static struct fstype_info fstypes[] = {
 		.ln = fs_ln_unsupported,
 		.unlink = fs_unlink_unsupported,
 		.mkdir = fs_mkdir_unsupported,
+	},
+#endif
+#ifdef CONFIG_FS_ISOFS
+	{
+		.fstype = FS_TYPE_ISOFS,
+		.name = "isofs",
+		.null_dev_desc_ok = false,
+		.probe = isofs_probe,
+		.close = isofs_close,
+		.ls = isofs_ls,
+		.exists = fs_exists_unsupported,
+		.size = isofs_size,
+		.read = isofs_read_file,
+		.write = fs_write_unsupported,
+		.unlink = fs_unlink_unsupported,
+		.mkdir = fs_mkdir_unsupported,
+		.uuid = fs_uuid_unsupported,
+		.opendir = fs_opendir_unsupported,
+		.unlink = fs_unlink_unsupported,
+		.ln = fs_ln_unsupported,
 	},
 #endif
 	{

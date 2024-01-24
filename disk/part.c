@@ -249,7 +249,10 @@ void part_init(struct blk_desc *dev_desc)
 		debug("%s: try '%s': ret=%d\n", __func__, entry->name, ret);
 		if (!ret) {
 			dev_desc->part_type = entry->part_type;
-			break;
+			if (entry->part_type == PART_TYPE_DOS)
+				continue;
+			else
+				break;
 		}
 	}
 }

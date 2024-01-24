@@ -991,6 +991,12 @@ endif
 endif
 endif
 
+ifeq ($(CONFIG_MACH_LOONGSON),y)
+ifeq ($(CONFIG_SPL),y)
+INPUTS-y += u-boot-with-spl.bin
+endif
+endif
+
 INPUTS-$(CONFIG_X86) += u-boot-x86-start16.bin u-boot-x86-reset16.bin \
 	$(if $(CONFIG_SPL_X86_16BIT_INIT),spl/u-boot-spl.bin) \
 	$(if $(CONFIG_TPL_X86_16BIT_INIT),tpl/u-boot-tpl.bin)
@@ -1435,6 +1441,18 @@ u-boot-dtb.img u-boot.img u-boot.kwb u-boot.pbl u-boot-ivt.img: \
 		,$(UBOOT_BIN)) FORCE
 	$(call if_changed,mkimage)
 	$(BOARD_SIZE_CHECK)
+
+u-boot.img.gz: u-boot.img FORCE
+	@gzip -kf9 $< > $@
+
+u-boot.img.lz4: u-boot.img FORCE
+	@lz4 -kf9 $< > $@
+
+u-boot.img.lzo: u-boot.img FORCE
+	@lzop -f9 $< -o $@
+
+u-boot.img.lzma: u-boot.img FORCE
+	$(call if_changed,lzma)
 
 ifeq ($(CONFIG_SPL_LOAD_FIT_FULL),y)
 MKIMAGEFLAGS_u-boot.itb =

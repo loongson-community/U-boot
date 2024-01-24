@@ -98,6 +98,13 @@ config SUNXI_AHCI
 	  Enable this driver to support the SATA controllers found in the
 	  Allwinner A10, A20 and R40 SoCs.
 
+config LOONGSON_AHCI
+	bool "Enable Loongson SATA driver support"
+	depends on DM_SCSI
+	help
+	  Enable this driver to support the SATA controllers found in the
+	  Loongson 2K500/2K1000 SoCs.
+
 endif # AHCI
 
 if SATA

@@ -36,6 +36,7 @@ obj-$(CONFIG_SYNQUACER_SPI) += spi-synquacer.o
 obj-$(CONFIG_ICH_SPI) +=  ich.o
 obj-$(CONFIG_IPROC_QSPI) += iproc_qspi.o
 obj-$(CONFIG_KIRKWOOD_SPI) += kirkwood_spi.o
+obj-$(CONFIG_LOONGSON_SPI) += ls_spi.o
 obj-$(CONFIG_MESON_SPIFC) += meson_spifc.o
 obj-$(CONFIG_MPC8XX_SPI) += mpc8xx_spi.o
 obj-$(CONFIG_MPC8XXX_SPI) += mpc8xxx_spi.o
