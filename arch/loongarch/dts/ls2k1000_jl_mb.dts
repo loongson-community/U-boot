@@ -131,7 +131,7 @@
 	};
 };
 
-&ls2k1000_LA_soc {
+&ls2k1000la_soc {
 	usb_config_type = <1>;
 };
 
